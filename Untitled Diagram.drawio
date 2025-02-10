@@ -109,6 +109,9 @@
             <mxPoint x="-165" y="550" as="targetPoint" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="rdGUtyS22fCp4dE0hmmU-39" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Notes:&lt;/h1&gt;&lt;div&gt;System shows 2 control boards with 2 gates at present. however the system can be expanded further. Each board can maintain 4 gates each, and at present I have 3 control boards, a status monitor, and the collector controller.&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-391" y="771" width="290" height="140" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
