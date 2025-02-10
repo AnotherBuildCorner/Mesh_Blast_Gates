@@ -110,7 +110,7 @@ Version 2 corrects a lot of the mistakes Version 1 made, and has resulted in a f
 ### PCBs 
 First, the PCB has been updated to contain power limiting safety measures. Among these are Fuse 1, set to a 1 amp glass tube fuse. and the addition of the large curent sense resistor RSense. Additionally a network of voltage dividers has been added to drop the 5-7 volt voltages at Rsense terminals to the 3.3V the ESP ADC can handle.
 
-The system uses a dual ended current sensing, with the resistance of Rsense known to within 1% and programmed. Voltage is measured at each terminal, the difference calculated, and from that current through the resistor is determined. This is used to initiate a restart in the code. As the gates are programmed to not move until a command is sent, this functions as a pause. This is temporary, in time a better response to a binding gate, like bounce or a simple stop will be implemented.
+The system uses dual ended current sensing, with the resistance of Rsense known to within 1% and programmed. Voltage is measured at each terminal, the difference calculated, and from that current through the resistor is determined. This is used to initiate a restart in the code. As the gates are programmed to not move until a command is sent, this functions as a pause. This is temporary, in time a better response to a binding gate, like bounce or a simple stop will be implemented.
 
 ![alt text](Photos/V2/PCB.png)
 
@@ -136,7 +136,8 @@ More precisely, a Herringbone rack and pinion was 3D printed.The herringbone is 
 
 ![alt text](<Photos/V2/Blast Gate Top.png>)![alt text](<Photos/V2/Blast Gate Bottom.png>)
 
-[Rack and Pinion in Operation.mov](<Photos/Gate Operation.MOV>)
+[Rack and Pinion in operation.mov](<Photos/V2/Gate Operation.MOV>)
+
 ## V1
 It's safe to consider this a very flawed early prototype. A lot of mistakes were made.
 Primarily you will note the absence of any sort of fuses/safety devices. This will really come back to bite later.
