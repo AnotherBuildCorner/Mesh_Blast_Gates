@@ -100,6 +100,10 @@ However this has not been enough. As it seems the ESP32 chips have been bricking
 To rectify this, I have placed Unidirectional TVS diodes in two places thus far. The first batch went on each of the input switches connected from signal to ground. This alone did not fix the problem, as shortly after implementing, another board fried.
 The second batch is connected from each of the servo signal wires to ground. This setup remains to be tested.
 
+Board with TVS Diodes added: Note, the switches are configured in switch to ground with PULL_UP enabled on the XIAO. So the TVS diodes clamp the voltage to 5V which is within acceptable ranges for the XIAO even though it's a 3.3V microcontroller.
+
+![alt text](<Photos/V2/V2 TVS Diodes Added.JPG>)
+
 For now I have switched to powering the system on 5V 1A usb power supplies for each module, as I ran out of the Buck controller chips, and as of right now USB power has proven more than powerful enough to control all but my largest gate with the entire system closed and under vacuum. Additionally I encountered some bad wire that had internal insulation problems which shorted out my transformer.  Sometimes it's best to know when to stick with what's working...  I will likely revisit the Buck controller at a later date. First is solving the frying ESP32's  otherwise this system is a useless brick.
 
 ## V2
