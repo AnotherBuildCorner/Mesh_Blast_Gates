@@ -4,17 +4,19 @@ Uses dual ended current sensing now.
 
 #include <ESP32Servo.h>
 
-#define BoardSel 3  //1 is Bandsaw  2 is Chopsaw  3 is Tablesaw
+#define BoardSel 3 //1 TS 2 Chop 3 BS
 #define SenseEnable 0
 #define loopdelay 30
 #define loopstep 1
+#define OpenGate 3
+#define OpenBoard 1
 #include <esp_now.h>
 #include <WiFi.h>
 const bool pull = 1; //0 for down 1 for up
 
 #define NUM_BUTTONS 4
 #define NUM_SERVOS 4
-#define NUM_PEERS 4
+#define NUM_PEERS 1
 #define NUM_BOARDS 3
 #define waittime 1000
 #define reboottime 5000
@@ -22,25 +24,20 @@ const bool pull = 1; //0 for down 1 for up
 #define rebootpushenable 0
 const int debounce[NUM_BOARDS] = {100,100,100};
 const int buttonPins[NUM_BUTTONS] = {2, 21, 22, 23};  // Change as per your setup
-//const int servoPins[NUM_SERVOS] = {23, 19, 20, 18};   
 const int servoPins[NUM_SERVOS] = {16, 17, 18, 19};      // Change as per your setup
 const int ActiveButtons[NUM_BOARDS] = {2,4,2};
-//const int startlimit[NUM_SERVOS] = {0,0,0,0};  // Bandsaw, Spare Port
-//const int endlimit[NUM_SERVOS]={150,160,60,60};
-//const int startlimit[NUM_SERVOS] = {0,0,0,0}; // Planer, Chop L, Chop R, Router
-//const int endlimit[NUM_SERVOS]={140,140,140,150};
-//const int startlimit[NUM_SERVOS] = {0,0,0,0};  // Tablesaw,  side port
-//const int endlimit[NUM_SERVOS]={145,150,60,60};
+
 
 const int startlimits[NUM_BOARDS][NUM_SERVOS] = {
   {0,0,0,0},
   {0,0,0,0},
   {0,0,0,0}
-  };  // Tablesaw,  side port
+  };
 const int endlimits[NUM_BOARDS][NUM_SERVOS]={
-{150,160,60,60}, //Bandsaw
-{140,140,140,150}, //Chop Saw
 {145,150,60,60}, // Table Saw
+{140,140,140,150}, //Chop Saw
+{150,160,60,60}, //Bandsaw
+
 
 };
 
@@ -87,14 +84,9 @@ typedef struct struct_message {
 struct_message myData;
 
 const uint8_t broadcastAddresses[NUM_PEERS][6] = {
-  {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // #1  Bandsaw board
-  {0xF0, 0xF5, 0xBD, 0x2C, 0xFE, 0x64}, //#2   Chopsaw Board
-  {0xF0, 0xF5, 0xBD, 0x2C, 0xFA, 0xC8}, // #3  Tablesaw Board
-  //{0xDC, 0xDA, 0x0C, 0xCE, 0xBD, 0xCD}, // Dust collector  last is CC  not CD
-  {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0},  //DC V2
 
-//{0xDC, 0xDA, 0x0C, 0xCE, 0xF4, 0x8C},  //4 pin
-  //{0x24, 0x6F, 0x28, 0xAE, 0xDC, 0x54}
+  {0x64, 0xE8, 0x33, 0x7F, 0x84, 0x3C},  //LED Monitor
+
 };
 
 void setup() {
@@ -126,10 +118,6 @@ void setup() {
     servos[i].attach(servoPins[i]);
     angle[i] = startlimit[i];
     pastangle[i] = angle[i];
-    if(i == 0){
-    angle[i] = endlimit[i];
-    pastangle[i] = angle[i];  
-    }
     servos[i].write(angle[i]);
     delay(1000);
   }
@@ -146,7 +134,6 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);
 
   for (int i = 0; i < NUM_PEERS; i++) {
-    if(i != BoardSel-1){
     esp_now_peer_info_t peerInfo;
     memcpy(peerInfo.peer_addr, broadcastAddresses[i], 6);
     peerInfo.channel = 0;  
@@ -155,7 +142,7 @@ void setup() {
       Serial.println("Failed to add peer");
       return;
     }
-  }}
+  }
 
   for (int i = 0; i < ActiveButtons[BoardSel-1]; i++) {
     if(pull == 0){
@@ -170,7 +157,7 @@ Serial.println("Setup Complete");
 
 
 void loop() {
-  digitalWrite(LED_BUILTIN,LOW);
+  blink_active();
   readCurrent();
   for (int i = 0; i < NUM_BUTTONS; i++) {
       if (digitalRead(buttonPins[i]) == pull){  // reset timer flag
@@ -188,8 +175,7 @@ void loop() {
       if(millis()-timer0[i] >= reboottime && rebootpushenable == 1){
         myData.reboot = true;
         for (int j = 0; j < NUM_PEERS; j++) {
-          if(j != BoardSel-1){
-        esp_now_send(broadcastAddresses[j], (uint8_t *) &myData, sizeof(myData));}
+        esp_now_send(broadcastAddresses[j], (uint8_t *) &myData, sizeof(myData));
       }
       if(myData.reboot == true){
         Serial.println("Rebooting.......");        
@@ -229,8 +215,7 @@ void loop() {
       lightLED(i);
       delay(waittime);  // Adjust delay as needed
       for (int j = 0; j < NUM_PEERS; j++) {
-        if(j != BoardSel-1){
-        esp_now_send(broadcastAddresses[j], (uint8_t *) &myData, sizeof(myData));}
+        esp_now_send(broadcastAddresses[j], (uint8_t *) &myData, sizeof(myData));
       }
 
       turnOffAllLEDs(i);
@@ -354,3 +339,29 @@ void OnDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomingData,
     Serial.println("Dust Remote Triggered");
   }
 }
+
+void blink_active(){
+  static bool LED = false;
+  static unsigned long internal_timer = 0;
+  unsigned long time_current = millis() ;
+  if(LED == false){
+    if(time_current > internal_timer+500){
+      LED = true;
+      digitalWrite(LED_BUILTIN,LED);
+      internal_timer = time_current;
+    }}
+
+  if(LED == true){
+    if(time_current > internal_timer+1500){
+      LED = false;
+      digitalWrite(LED_BUILTIN,LED);
+      internal_timer = time_current;
+    }}
+
+}
+
+
+
+
+
+  //digitalWrite(LED_BUILTIN,LOW);}

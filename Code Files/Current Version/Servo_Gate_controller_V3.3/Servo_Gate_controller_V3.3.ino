@@ -4,17 +4,19 @@ Uses dual ended current sensing now.
 
 #include <ESP32Servo.h>
 
-#define BoardSel 3  //1 is Bandsaw  2 is Chopsaw  3 is Tablesaw
+#define BoardSel 2 //1 TS 2 Chop 3 BS
 #define SenseEnable 0
 #define loopdelay 30
 #define loopstep 1
+#define OpenGate 3
+#define OpenBoard 1
 #include <esp_now.h>
 #include <WiFi.h>
 const bool pull = 1; //0 for down 1 for up
 
 #define NUM_BUTTONS 4
 #define NUM_SERVOS 4
-#define NUM_PEERS 4
+#define NUM_PEERS 5
 #define NUM_BOARDS 3
 #define waittime 1000
 #define reboottime 5000
@@ -38,9 +40,12 @@ const int startlimits[NUM_BOARDS][NUM_SERVOS] = {
   {0,0,0,0}
   };  // Tablesaw,  side port
 const int endlimits[NUM_BOARDS][NUM_SERVOS]={
-{150,160,60,60}, //Bandsaw
-{140,140,140,150}, //Chop Saw
 {145,150,60,60}, // Table Saw
+
+{140,140,140,150}, //Chop Saw
+
+{150,160,60,60}, //Bandsaw
+
 
 };
 
@@ -87,11 +92,12 @@ typedef struct struct_message {
 struct_message myData;
 
 const uint8_t broadcastAddresses[NUM_PEERS][6] = {
+  {0xF0, 0xF5, 0xBD, 0x2C, 0xFF, 0x80}, // #3  Tablesaw Board
+  {0xF0, 0xF5, 0xBD, 0x2D, 0x03, 0x58}, //#2   Chopsaw Board
   {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // #1  Bandsaw board
-  {0xF0, 0xF5, 0xBD, 0x2C, 0xFE, 0x64}, //#2   Chopsaw Board
-  {0xF0, 0xF5, 0xBD, 0x2C, 0xFA, 0xC8}, // #3  Tablesaw Board
-  //{0xDC, 0xDA, 0x0C, 0xCE, 0xBD, 0xCD}, // Dust collector  last is CC  not CD
+
   {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0},  //DC V2
+  {0x64, 0xE8, 0x33, 0x7F, 0x84, 0x3C},  //LED Monitor
 
 //{0xDC, 0xDA, 0x0C, 0xCE, 0xF4, 0x8C},  //4 pin
   //{0x24, 0x6F, 0x28, 0xAE, 0xDC, 0x54}
@@ -126,10 +132,12 @@ void setup() {
     servos[i].attach(servoPins[i]);
     angle[i] = startlimit[i];
     pastangle[i] = angle[i];
-    if(i == 0){
-    angle[i] = endlimit[i];
-    pastangle[i] = angle[i];  
-    }
+    //if(OpenBoard == BoardSel){
+
+    //if(i == OpenGate){
+    //angle[i] = endlimit[i];
+    //pastangle[i] = angle[i];  
+  //}}
     servos[i].write(angle[i]);
     delay(1000);
   }
@@ -328,6 +336,7 @@ void turnOffAllLEDs(int index) {
 }
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  delay(50);
   Serial.print("Last Packet Send Status: ");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }

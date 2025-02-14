@@ -43,6 +43,7 @@ void setup() {
     Serial.print("MAC Address: ");
     Serial.println(WiFi.macAddress());
     pinMode(ContactorPin, OUTPUT);
+    pinMode(LED_BUILTIN,OUTPUT);
 
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
@@ -66,6 +67,7 @@ void setup() {
 }
 
 void loop() {
+  blink_active();
     if (millis() - startTime >= SLEEP_TIME && recflag == true) {
       Serial.println("Timer Sleep Activated");
       digitalWrite(ContactorPin, false);
@@ -155,3 +157,22 @@ void OnDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomingData,
     startTime = millis();
 }
 
+void blink_active(){
+  static bool LED = false;
+  static unsigned long internal_timer = 0;
+  unsigned long time_current = millis() ;
+  if(LED == false){
+    if(time_current > internal_timer+500){
+      LED = true;
+      digitalWrite(LED_BUILTIN,LED);
+      internal_timer = time_current;
+    }}
+
+  if(LED == true){
+    if(time_current > internal_timer+1500){
+      LED = false;
+      digitalWrite(LED_BUILTIN,LED);
+      internal_timer = time_current;
+    }}
+
+}
