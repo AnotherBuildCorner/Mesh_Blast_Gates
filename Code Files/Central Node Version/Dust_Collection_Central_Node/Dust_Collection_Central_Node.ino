@@ -36,13 +36,13 @@ bool new_states = false;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-  pinMode(LED_BUILTIN,OUTPUT);
-  pinMode(DC_led,OUTPUT);
+//  pinMode(LED_BUILTIN,OUTPUT);
+  /*pinMode(DC_led,OUTPUT);
   for(int i = 0; i < 3; i++){
     for(int j = 0; j < 4; j++){
       pinMode(LED_binds[i][j],OUTPUT);
     }
-  }
+  }*/
   WiFi.mode(WIFI_STA);
   WiFi.begin();
 
@@ -75,7 +75,7 @@ void setup() {
 
 
 void loop() {
-blink_active();
+//blink_active();
 static int light = 0;
 static int interval = 5;
   // put your main code here, to run repeatedly:
@@ -172,14 +172,14 @@ void blink_active(){
   if(LED == false){
     if(time_current > internal_timer+500){
       LED = true;
-      digitalWrite(LED_BUILTIN,LED);
+//      digitalWrite(LED_BUILTIN,LED);
       internal_timer = time_current;
     }}
 
   if(LED == true){
     if(time_current > internal_timer+1500){
       LED = false;
-      digitalWrite(LED_BUILTIN,LED);
+ //     digitalWrite(LED_BUILTIN,LED);
       internal_timer = time_current;
     }}
 
