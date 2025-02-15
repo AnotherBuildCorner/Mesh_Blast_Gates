@@ -11,8 +11,8 @@ extern const int relayPins[NUM_RELAYS];
 extern bool relayStates[NUM_RELAYS];
 
 // Define pushbutton pins
-#define PUSHBUTTON1_PIN 4
-#define PUSHBUTTON2_PIN 5
+#define PUSHBUTTON1_PIN 2
+#define PUSHBUTTON2_PIN 21
 
 // Function prototypes
 void Initialize_Relays();
@@ -22,5 +22,5 @@ void ControlRelayWithCollectorState(bool state);
 void ControlRelayWithExtraState(bool state);
 void ReadPushbuttonsAndControlStates();
 void Initialize_Relay_Buttons(); // Update function prototype
-
+void ControlFromIncoming(); // Declare the new function
 #endif // RELAYS_H

@@ -86,6 +86,7 @@ void central_node_main(){
     InitializeWIFI_Serial(); 
     Initialize_Relays();
     Initialize_Relay_Buttons();
+    LaunchEndpoints();
 
     delay(2000);
     
@@ -94,7 +95,9 @@ void central_node_main(){
 
   void collector_node_main(){
     blink_active();
+    ControlFromIncoming();
     ReadPushbuttonsAndControlStates();
+    
     // Add other loop functionalities here
   }
 
