@@ -23,6 +23,7 @@ bool buttonLongPress[NUM_BUTTONS] = {false};
 bool buttonShortPress[NUM_BUTTONS] = {false};
 bool GateStatusLongPress[4] = {0};
 bool GateStatusShortPress[4] = {0};
+bool messageSent[NUM_BUTTONS] = {false}; // Add flag for message sent
 
 void blink_active() {
     static bool LED = false;
@@ -82,45 +83,52 @@ void Initialize_Buttons() {
 
 void readButtonPresses() {
     bool buttonPressed = false;
-    for (int i = 0; i < NUM_BUTTONS; i++) {
+    static bool longpressflag = false;
+    for (int i = 0; i < ActiveButtons[BoardSel - 1]; i++) {
         int buttonState = digitalRead(buttonPins[i]);
-        if (buttonState == HIGH) {
+        if (buttonState == !pull && longpressflag==false ) { // Check based on pull variable
             if (buttonPressStart[i] == 0) {
                 buttonPressStart[i] = millis();
             } else if (millis() - buttonPressStart[i] > 1000) { // Long press threshold
                 buttonLongPress[i] = true;
                 buttonShortPress[i] = false;
                 buttonPressed = true;
+                longpressflag = true;
             } else if (millis() - buttonPressStart[i] > 50) { // Short press threshold
                 buttonShortPress[i] = true;
                 buttonLongPress[i] = false;
                 buttonPressed = true;
             }
         } else {
-            if (buttonLongPress[i]) {
-                GateStatusLongPress[i] = !GateStatusLongPress[i];
-                for(int j = 0; j < NUM_BUTTONS; j++) {
-                    if (j != i) {
-                        GateStatusLongPress[j] = false;
+            if (buttonLongPress[i] || buttonShortPress[i]) {
+                if (!messageSent[i]) {
+                    if (buttonLongPress[i]) {
+                        GateStatusLongPress[i] = !GateStatusLongPress[i];
+                        for (int j = 0; j < NUM_BUTTONS; j++) {
+                            if (j != i) {
+                                GateStatusLongPress[j] = false;
+                            }
+                        }
+                    } else if (buttonShortPress[i]) {
+                        GateStatusShortPress[i] = !GateStatusShortPress[i];
+                        for (int j = 0; j < NUM_BUTTONS; j++) {
+                            if (j != i) {
+                                GateStatusShortPress[j] = false;
+                            }
+                        }
                     }
+                    resetGateStatusArrays();
+                    resolvePressConflicts(GateStatusLongPress, GateStatusShortPress, NUM_BUTTONS);
+                    sendGateStatusToCentralNode(GateStatusLongPress, GateStatusShortPress);
+                    messageSent[i] = true; // Set message sent flag
+                    longpressflag = false;
                 }
-            } else if (buttonShortPress[i]) {
-                GateStatusShortPress[i] = !GateStatusShortPress[i];
-                for(int j = 0; j < NUM_BUTTONS; j++) {
-                    if (j != i) {
-                        GateStatusShortPress[j] = false;
-                    }
-                } // Assuming single endpoint for simplicity
             }
             buttonPressStart[i] = 0;
             buttonLongPress[i] = false;
             buttonShortPress[i] = false;
+            messageSent[i] = false; // Reset message sent flag when button is released
         }
-    }
-    if (buttonPressed) {
-        resetGateStatusArrays();
-        resolvePressConflicts(buttonLongPress, buttonShortPress, NUM_BUTTONS);
-        sendGateStatusToCentralNode(GateStatusLongPress, GateStatusShortPress);
     }
 }
 
@@ -138,6 +146,16 @@ void TestLED(bool shortPress[], bool longPress[], const int servoPins[]) {
             digitalWrite(servoPins[i], HIGH);
             Serial.print(i);
             Serial.println(" LED ON");
+        } else {
+            digitalWrite(servoPins[i], LOW);
+        }
+    }
+}
+
+void illuminateLEDsBasedOnPress(bool shortPress[], bool longPress[], const int servoPins[]) {
+    for (int i = 0; i < NUM_SERVOS; i++) {
+        if (shortPress[i] || longPress[i]) {
+            digitalWrite(servoPins[i], HIGH);
         } else {
             digitalWrite(servoPins[i], LOW);
         }

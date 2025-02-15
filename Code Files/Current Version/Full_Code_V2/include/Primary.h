@@ -4,10 +4,11 @@
 #include <ESP32Servo.h>
 #include <esp_now.h>
 #include <WiFi.h>
+#include "Relays.h" // Include Relays.h
 
 // Define constants
-#define BoardSel 2 //1 TS 2 Chop 3 BS, assigns MAC address to the system
-#define BoardType 1 //1 For endpoints, 2 for collector, 3 for central
+#define BoardSel 1 //1 TS 2 Chop 3 BS, assigns MAC address to the system
+#define BoardType 3 //1 For endpoints, 2 for collector, 3 for central
 
 #define SenseEnable false //current sense enable
 #define loopdelay 30

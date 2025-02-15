@@ -13,7 +13,7 @@
 #define ADCmax 3000.0
 #define currentreadout 0
 #define readthresh 0.5
-#define readout2 1
+#define readout2 0
 #define currentThresh 1.5
 
 extern const int powerPins[single_or_dual];

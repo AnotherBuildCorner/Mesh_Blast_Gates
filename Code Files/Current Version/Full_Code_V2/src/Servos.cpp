@@ -1,4 +1,9 @@
 #include "Servos.h"
+#include "Current_Sense.h"
+
+
+// Define the gateflag variable
+bool gateflag = true;
 
 // Ensure extern variables are declared
 const int debounce[NUM_BOARDS] = {100, 100, 100};
@@ -32,7 +37,53 @@ void Initialize_Servos() {
         delay(1000);
     }
 
-    for (int i = 0; i < NUM_SERVOS; i++) {
-        servos[i].detach();
+    //for (int i = 0; i < NUM_SERVOS; i++) {
+      //  servos[i].detach();}
+    
+}
+
+void write_servo_position() {
+    for (int j = 0; j < NUM_SERVOS; j++) {
+        if (pastangle[j] < angle[j]) {
+            //servos[j].attach(servoPins[j]);
+            Serial.print("Gate ");
+            Serial.print(j + 1);
+            Serial.println(" Opening");
+            gateflag = true;
+            for (int i = pastangle[j]; i <= angle[j]; i++) {
+                readCurrent();
+                // Serial.println(i);
+                servos[j].write(i);
+                delay(loopdelay);
+            }
+            //servos[j].detach();
+            pastangle[j] = angle[j];
+        }
+
+        if (pastangle[j] > angle[j] && gateflag == true) {
+            //servos[j].attach(servoPins[j]);
+            Serial.print("Gate ");
+            Serial.print(j + 1);
+            Serial.println(" Closing");
+            for (int i = pastangle[j]; i >= angle[j]; i--) {
+                readCurrent();
+                // Serial.println(i);
+                servos[j].write(i);
+                delay(loopdelay);
+            }
+            //servos[j].detach();
+            pastangle[j] = angle[j];
+        }
     }
 }
+
+void updateServoAngles(bool shortPress[], bool longPress[]) {
+    for (int i = 0; i < NUM_SERVOS; i++) {
+        if (shortPress[i] || longPress[i]) {
+            angle[i] = endlimit[i];
+        } else {
+            angle[i] = startlimit[i];
+        }
+    }
+}
+

@@ -8,7 +8,6 @@ extern unsigned long t2;
 extern bool timerlock[NUM_BUTTONS];
 extern int angle[NUM_SERVOS];
 extern int pastangle[NUM_SERVOS];
-extern bool gateflag;
 extern bool quesend[NUM_BUTTONS];
 extern int last_active;
 

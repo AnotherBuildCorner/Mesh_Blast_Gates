@@ -8,10 +8,14 @@ const uint8_t CentralNodeAddress[6] = {0x8C, 0xBF, 0xEA, 0xCF, 0x7F, 0x00};//{0x
 const uint8_t EndpointAddresses[NUM_PEERS][6] = {
     {0x8C, 0xBF, 0xEA, 0xCF, 0x82, 0x3C},
     {0x8C, 0xBF, 0xEA, 0xCF, 0x75, 0x44},
+
+    {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // #1  Bandsaw board
+    {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0},  //DC V2*/
     // Add other endpoint addresses here
 };
 
 Board_Data BoardData; // Define BoardData here
+bool new_data_recv = false; // Initialize the new boolean flag
 
 void EndpointDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
     Serial.print("Last Packet Send Status: ");
@@ -30,14 +34,14 @@ void EndpointDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomin
     Serial.println(BoardData.CollectorState);
     Serial.print("Board: ");
     Serial.print(BoardData.board);
-    Serial.print(" Button: ");
-    Serial.println(BoardData.button);
 
-    if (BoardData.board != 0) {
-        delay(waittime);
-    } else {
-        Serial.println("Dust Remote Triggered");
+    // Convert integer values to binary representation and write to GateStatus arrays
+    for (int i = 0; i < NUM_PEERS; i++) {
+        mapPressToBinary(BoardData.ShortPress[i], GateStatusShortPress);
+        mapPressToBinary(BoardData.LongPress[i], GateStatusLongPress);
     }
+
+    new_data_recv = true; // Set the new_data_recv flag to true
 }
 
 void CentralNodeDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
@@ -57,14 +61,28 @@ void CentralNodeDataRecv(const esp_now_recv_info* recv_info, const uint8_t* inco
     Serial.println(BoardData.CollectorState);
     Serial.print("Board: ");
     Serial.print(BoardData.board);
-    Serial.print(" Button: ");
-    Serial.println(BoardData.button);
 
-    if (BoardData.board != 0) {
-        delay(waittime);
-    } else {
-        Serial.println("Dust Remote Triggered");
+    new_data_recv = true; // Set the new_data_recv flag to true
+}
+
+void push_data() {
+    if (new_data_recv) {
+        checkPressAndSetCollectorState();
+        for (int i = 0; i < NUM_PEERS; i++) {
+            esp_now_send(EndpointAddresses[i], (uint8_t *) &BoardData, sizeof(BoardData));
+        }
+        new_data_recv = false; // Reset the flag after sending data
     }
+}
+
+void checkPressAndSetCollectorState() {
+    for (int i = 0; i < NUM_PEERS; i++) {
+        if (BoardData.ShortPress[i] != 0 || BoardData.LongPress[i] != 0) {
+            BoardData.CollectorState = true;
+            return;
+        }
+    }
+    BoardData.CollectorState = false;
 }
 
 void initializeMeshNetworkData(Board_Data &data) {
@@ -141,9 +159,9 @@ int mapBinaryToPress(const bool GateStatusArray[4]) {
 }
 
 void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusShortPress[4]) {
-
-        BoardData.LongPress[BoardSel] = mapBinaryToPress(GateStatusLongPress);
-        BoardData.ShortPress[BoardSel] = mapBinaryToPress(GateStatusShortPress);
+    BoardData.board = BoardSel; // Set BoardData.board to BoardSel
+    BoardData.LongPress[BoardSel] = mapBinaryToPress(GateStatusLongPress);
+    BoardData.ShortPress[BoardSel] = mapBinaryToPress(GateStatusShortPress);
     esp_now_send(CentralNodeAddress, (uint8_t *) &BoardData, sizeof(BoardData));
 }
 

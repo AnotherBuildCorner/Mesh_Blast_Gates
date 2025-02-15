@@ -23,6 +23,7 @@ typedef struct Board_Data {
 } Board_Data;
 
 extern Board_Data BoardData;
+extern bool new_data_recv; // Declare the new boolean flag
 
 void EndpointDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
 void EndpointDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomingData, int len);
@@ -35,5 +36,7 @@ void mapPressToBinary(int value, bool GateStatusArray[4]);
 int mapBinaryToPress(const bool GateStatusArray[4]);
 void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusShortPress[4]);
 void resetGateStatusArrays();
+void push_data(); // Declare the new function
+void checkPressAndSetCollectorState(); // Declare the new function
 
 #endif // MESH_NETWORK_H

@@ -16,8 +16,11 @@ extern const int *endlimit;
 extern Servo servos[NUM_SERVOS];
 extern int angle[NUM_SERVOS];
 extern int pastangle[NUM_SERVOS];
+extern bool gateflag; // Declare gateflag here
 
 // Function prototypes
 void Initialize_Servos();
+void write_servo_position();
+void updateServoAngles(bool shortPress[], bool longPress[]);
 
 #endif // SERVOS_H
