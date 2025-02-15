@@ -95,6 +95,8 @@ void collector_node_main(){
     blink_active();
     ControlFromIncoming();
     ReadPushbuttonsAndControlStates();
+    reset_timers();
+    check_timers();
     // Add other loop functionalities here
 }
 

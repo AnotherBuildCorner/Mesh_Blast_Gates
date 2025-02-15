@@ -6,6 +6,13 @@ const int relayPins[NUM_RELAYS] = {22, 23}; // Example pin numbers, change as ne
 bool relayStates[NUM_RELAYS] = {false, false}; // Ensure initial states are LOW
 const int debounceTime = 200;
 const bool startstate = LOW;
+
+extern bool new_data_recv;
+const unsigned long Minutes =   60000;
+unsigned long timer = 0;
+unsigned long timeend = 0;
+unsigned long gatetimer = 0;
+unsigned long gatetimer2 = 0;
 void Initialize_Relays() {
     for (int i = 0; i < NUM_RELAYS; i++) {
         pinMode(relayPins[i], OUTPUT);
@@ -55,14 +62,30 @@ void ControlRelayWithExtraState(bool state) {
 }
 
 void ControlFromIncoming() {
+    static bool lock1 = false;
+    static bool lock2 = false;
     if (BoardData.CollectorState != relayStates[0]) {
-        SetRelayState(0, BoardData.CollectorState);
-        Serial.println("CollectorState changed to " + String(BoardData.CollectorState));
+        if(lock1==false){
+        gatetimer = millis();
+        lock1 = true;
     }
+        if(millis() > gatetimer + 1000*CollectorDelay){
+        SetRelayState(0, BoardData.CollectorState);
+        lock1 = false;
+        Serial.println("CollectorState changed to " + String(BoardData.CollectorState));
+    }}
     if (BoardData.ExtraState != relayStates[1]) {
+        if(lock2==false){
+            gatetimer2 = millis();
+            lock2 = true;
+        }
+
+        if(millis() > gatetimer2 + 1000*CollectorDelay){
         SetRelayState(1, BoardData.ExtraState);
+        lock2 = false;
         Serial.println("ExtraState changed to " + String(BoardData.ExtraState));
     }
+}
 }
 
 void ReadPushbuttonsAndControlStates() {
@@ -89,5 +112,38 @@ void ReadPushbuttonsAndControlStates() {
             Serial.println("Button 2 pressed, ExtraState toggled to " + String(BoardData.ExtraState));
         }
         lastButton2State = button2State;
+    }
+}
+
+void reset_timers(){
+    if(new_data_recv == true){
+        timer = millis();
+        int zerocheck1 = 0;
+        int zerocheck2 = 0;
+    for( int i = 0; i < NUM_PEERS; i++){
+        zerocheck1 += BoardData.LongPress[i];
+        zerocheck2 += BoardData.ShortPress[i];
+    }
+    new_data_recv = false;
+if(zerocheck1 > 0) {
+timeend = timer + Minutes*BoardData.LongTimer;
+Serial.println("Long Timer Set for: " + String(BoardData.LongTimer) + " minutes");
+}
+else if(zerocheck2 > 0){
+    timeend = timer + Minutes*BoardData.ShortTimer;
+    Serial.println("Short Timer Set for: " + String(BoardData.ShortTimer) + " minutes");
+    }
+}
+}
+
+void check_timers(){
+    if(millis() > timeend && BoardData.CollectorState == HIGH){
+        for(int i = 0; i < NUM_RELAYS; i++){
+            SetRelayState(i, LOW);
+        }
+        BoardData.CollectorState = LOW;
+        BoardData.ExtraState = LOW;
+        esp_now_send(CentralNodeAddress, (uint8_t *) &BoardData, sizeof(BoardData));
+        Serial.println("Relays turned off due to timer expiration");
     }
 }

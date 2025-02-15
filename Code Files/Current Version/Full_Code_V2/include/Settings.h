@@ -3,12 +3,12 @@
 
 #include "Primary.h"
 
-
-
 #define NUM_GATE_BOARDS 3
 #define NUM_PEERS 5  // Total Number of Chips in system
 #define NUM_BUTTONS 4 // Max number buttons per board
-
+#define Short_Timer_Min  1
+#define Long_Timer_Min 2
+#define CollectorDelay 1 // second
 // Define enums for board labels and types
 enum BoardLabelEnum {
     BS = 2,
@@ -24,9 +24,8 @@ enum BoardTypeEnum {
     center,
     remote
 };
-
 // Declare settings-related variables
-inline BoardLabelEnum BoardSel = TS;
+inline BoardLabelEnum BoardSel = DC;
 inline BoardTypeEnum BoardTypeArray[] = {gates, gates, gates, collector, center};
 inline const char* BoardLabelArray[] = 
 {   "TS Board", 

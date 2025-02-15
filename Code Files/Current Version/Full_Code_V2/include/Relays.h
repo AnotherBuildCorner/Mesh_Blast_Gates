@@ -23,4 +23,6 @@ void ControlRelayWithExtraState(bool state);
 void ReadPushbuttonsAndControlStates();
 void Initialize_Relay_Buttons(); // Update function prototype
 void ControlFromIncoming(); // Declare the new function
+void reset_timers();
+void check_timers();
 #endif // RELAYS_H

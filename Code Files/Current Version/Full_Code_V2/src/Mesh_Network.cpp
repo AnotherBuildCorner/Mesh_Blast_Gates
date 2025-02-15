@@ -3,8 +3,7 @@
 #include "Settings.h" // Include Settings.h to access MAC addresses
 
 // Ensure extern variables are declared
-extern int last_active;
-
+extern int last_active; 
 Board_Data BoardData; // Define BoardData here
 bool new_data_recv = false; // Initialize the new boolean flag
 
@@ -82,6 +81,7 @@ void checkPressAndSetCollectorState() {
     }
     BoardData.CollectorState = false;
 }
+
 
 void initializeMeshNetworkData(Board_Data &data) {
     // Initialize the new arrays
