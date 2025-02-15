@@ -1,16 +1,17 @@
 #include "Primary.h"
 #include "Servos.h" // Include Servos.h to access necessary variables
 #include "Mesh_Network.h" // Include Mesh_Network.h to access necessary variables
+
 // Define last_active
 int last_active = 10;
 
 // Ensure extern variables are declared
-extern const int debounce[NUM_BOARDS];
+extern const int debounce[NUM_GATE_BOARDS]; // Updated constant name
 extern const int buttonPins[NUM_BUTTONS];
 extern const int servoPins[NUM_SERVOS];
-extern const int ActiveButtons[NUM_BOARDS];
-extern const int startlimits[NUM_BOARDS][NUM_SERVOS];
-extern const int endlimits[NUM_BOARDS][NUM_SERVOS];
+extern const int ActiveButtons[NUM_GATE_BOARDS]; // Updated constant name
+extern const int startlimits[NUM_GATE_BOARDS][NUM_SERVOS]; // Updated constant name
+extern const int endlimits[NUM_GATE_BOARDS][NUM_SERVOS]; // Updated constant name
 extern const int *startlimit;
 extern const int *endlimit;
 extern Servo servos[NUM_SERVOS];
@@ -24,7 +25,7 @@ bool buttonShortPress[NUM_BUTTONS] = {false};
 bool GateStatusLongPress[4] = {0};
 bool GateStatusShortPress[4] = {0};
 bool messageSent[NUM_BUTTONS] = {false}; // Add flag for message sent
-
+bool triggerservos = false;
 void blink_active() {
     static bool LED = false;
     static unsigned long internal_timer = 0;
@@ -72,7 +73,7 @@ void InitializeWIFI_Serial() {
 }
 
 void Initialize_Buttons() {
-    for (int i = 0; i < ActiveButtons[BoardSel - 1]; i++) {
+    for (int i = 0; i < ActiveButtons[BoardSel]; i++) {
         if (pull == 0) {
             pinMode(buttonPins[i], INPUT_PULLDOWN);
         } else {
@@ -84,9 +85,9 @@ void Initialize_Buttons() {
 void readButtonPresses() {
     bool buttonPressed = false;
     static bool longpressflag = false;
-    for (int i = 0; i < ActiveButtons[BoardSel - 1]; i++) {
+    for (int i = 0; i < ActiveButtons[BoardSel]; i++) {
         int buttonState = digitalRead(buttonPins[i]);
-        if (buttonState == !pull && longpressflag==false ) { // Check based on pull variable
+        if (buttonState == !pull && longpressflag == false) { // Check based on pull variablee
             if (buttonPressStart[i] == 0) {
                 buttonPressStart[i] = millis();
             } else if (millis() - buttonPressStart[i] > 1000) { // Long press threshold
@@ -104,6 +105,7 @@ void readButtonPresses() {
                 if (!messageSent[i]) {
                     if (buttonLongPress[i]) {
                         GateStatusLongPress[i] = !GateStatusLongPress[i];
+                        BoardData.button = i;
                         for (int j = 0; j < NUM_BUTTONS; j++) {
                             if (j != i) {
                                 GateStatusLongPress[j] = false;
@@ -111,17 +113,20 @@ void readButtonPresses() {
                         }
                     } else if (buttonShortPress[i]) {
                         GateStatusShortPress[i] = !GateStatusShortPress[i];
+                        BoardData.button = i;
                         for (int j = 0; j < NUM_BUTTONS; j++) {
                             if (j != i) {
                                 GateStatusShortPress[j] = false;
                             }
                         }
                     }
+                    // Ensure resetGateStatusArrays() does not reset the gate status arrays unless intended
                     resetGateStatusArrays();
                     resolvePressConflicts(GateStatusLongPress, GateStatusShortPress, NUM_BUTTONS);
-                    sendGateStatusToCentralNode(GateStatusLongPress, GateStatusShortPress);
                     messageSent[i] = true; // Set message sent flag
                     longpressflag = false;
+                    PrintLocalGateArrays();
+                    triggerservos = true;
                 }
             }
             buttonPressStart[i] = 0;

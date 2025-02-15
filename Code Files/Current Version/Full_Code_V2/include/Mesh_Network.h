@@ -8,9 +8,6 @@
 // Remove the redefinition of NUM_PEERS
 // #define NUM_PEERS 10 // Total Number of Endpoints, and collector boards
 
-extern const uint8_t CentralNodeAddress[6];
-extern const uint8_t EndpointAddresses[NUM_PEERS][6];
-
 // Update struct_message definition to Board_Data
 typedef struct Board_Data {
     bool CollectorState;
@@ -38,5 +35,6 @@ void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusSho
 void resetGateStatusArrays();
 void push_data(); // Declare the new function
 void checkPressAndSetCollectorState(); // Declare the new function
-
+void PrintGateArrays();
+void PrintLocalGateArrays();
 #endif // MESH_NETWORK_H

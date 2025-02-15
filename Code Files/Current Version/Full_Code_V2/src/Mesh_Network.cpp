@@ -1,18 +1,9 @@
 #include "Mesh_Network.h"
 #include "Primary.h" // Include Primary.h to resolve undefined reference
+#include "Settings.h" // Include Settings.h to access MAC addresses
 
 // Ensure extern variables are declared
 extern int last_active;
-
-const uint8_t CentralNodeAddress[6] = {0x8C, 0xBF, 0xEA, 0xCF, 0x7F, 0x00};//{0xC8, 0x2E, 0x18, 0xF1, 0x2B, 0xA4};
-const uint8_t EndpointAddresses[NUM_PEERS][6] = {
-    // Add other endpoint addresses here
-    {0x8C, 0xBF, 0xEA, 0xCF, 0x82, 0x3C},
-    {0x8C, 0xBF, 0xEA, 0xCF, 0x75, 0x44},
-
-    {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // #1  Bandsaw board
-    {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0},  //DC V2*/
-};
 
 Board_Data BoardData; // Define BoardData here
 bool new_data_recv = false; // Initialize the new boolean flag
@@ -30,13 +21,14 @@ void EndpointDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomin
     }
 
     last_active = 10; // Highlight the usage of last_active
-    Serial.print("DC State");
-    Serial.println(BoardData.CollectorState);
-    Serial.print("Board: ");
-    Serial.print(BoardData.board);
+    if(BoardData.board <= NUM_GATE_BOARDS){
+        Serial.print("DC State");
+        Serial.println(BoardData.CollectorState);
+        Serial.print(GateNames[BoardData.board][BoardData.button]);
+        Serial.println(" Actuated");}
 
     // Convert integer values to binary representation and write to GateStatus arrays
-    for (int i = 0; i < NUM_PEERS; i++) {
+    for (int i = 0; i < NUM_GATE_BOARDS; i++) {
         mapPressToBinary(BoardData.ShortPress[i], GateStatusShortPress);
         mapPressToBinary(BoardData.LongPress[i], GateStatusLongPress);
     }
@@ -57,10 +49,12 @@ void CentralNodeDataRecv(const esp_now_recv_info* recv_info, const uint8_t* inco
     }
 
     last_active = 10; // Highlight the usage of last_active
+    if(BoardData.board <= NUM_GATE_BOARDS){
     Serial.print("DC State");
     Serial.println(BoardData.CollectorState);
-    Serial.print("Board: ");
-    Serial.print(BoardData.board);
+    Serial.print(GateNames[BoardData.board][BoardData.button]);
+    Serial.println(" Actuated");}
+    PrintGateArrays();
 
     new_data_recv = true; // Set the new_data_recv flag to true
 }
@@ -76,7 +70,7 @@ void push_data() {
 }
 
 void checkPressAndSetCollectorState() {
-    for (int i = 0; i < NUM_PEERS; i++) {
+    for (int i = 0; i < NUM_GATE_BOARDS; i++) {
         if (BoardData.ShortPress[i] != 0 || BoardData.LongPress[i] != 0) {
             BoardData.CollectorState = true;
             return;
@@ -95,6 +89,7 @@ void initializeMeshNetworkData(Board_Data &data) {
 }
 
 void LaunchEndpoints() {
+    Serial.println(BoardLabelArray[BoardSel]);
     if (esp_now_init() != ESP_OK) {
         Serial.println("Error initializing ESP-NOW");
         return;
@@ -113,6 +108,7 @@ void LaunchEndpoints() {
 }
 
 void LaunchCentralNode() {
+    Serial.println(BoardLabelArray[BoardSel]);
     if (esp_now_init() != ESP_OK) {
         Serial.println("Error initializing ESP-NOW");
         return;
@@ -133,7 +129,7 @@ void LaunchCentralNode() {
 }
 
 void startup_push() {
-    if (BoardType == 3) { // Central Node
+    if (BoardTypeArray[BoardSel] == center) { // Central Node
         Serial.println("sending from Central Node");
         for (int i = 0; i < NUM_PEERS; i++) {
             esp_now_send(EndpointAddresses[i], (uint8_t *) &BoardData, sizeof(BoardData));
@@ -166,8 +162,42 @@ void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusSho
 }
 
 void resetGateStatusArrays() {
-    for (int i = 0; i < NUM_PEERS; ++i) {
+    for (int i = 0; i < NUM_SERVOS; ++i) {
         BoardData.LongPress[i] = 0;
         BoardData.ShortPress[i] = 0;
     }
+    for (int i = NUM_SERVOS; i < NUM_PEERS; ++i) {
+        BoardData.LongPress[i] = 0;
+        BoardData.ShortPress[i] = 0;
+    }
+}
+
+void PrintGateArrays(){
+    Serial.print("Global Long Press States | (");
+    for(int i = 0; i < NUM_PEERS; i++){
+        Serial.print(BoardData.LongPress[i]);
+        Serial.print(", ");
+    }
+    Serial.println(")");
+    Serial.print("Global Short Press States | (");
+    for(int i = 0; i < NUM_PEERS; i++){
+        Serial.print(BoardData.ShortPress[i]);
+        Serial.print(", ");
+    }
+    Serial.println(")");
+}
+
+void PrintLocalGateArrays(){
+    Serial.print("Local  Long Press States | (");
+    for(int i = 0; i < NUM_SERVOS; i++){
+        Serial.print(GateStatusLongPress[i]);
+        Serial.print(", ");
+    }
+    Serial.println(")");
+    Serial.print("Local  Short Press States | (");
+    for(int i = 0; i < NUM_SERVOS; i++){
+        Serial.print(GateStatusShortPress[i]);
+        Serial.print(", ");
+    }
+    Serial.println(")");
 }
