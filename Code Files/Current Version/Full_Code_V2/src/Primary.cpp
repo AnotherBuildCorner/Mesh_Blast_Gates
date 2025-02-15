@@ -26,6 +26,7 @@ bool GateStatusLongPress[4] = {0};
 bool GateStatusShortPress[4] = {0};
 bool messageSent[NUM_BUTTONS] = {false}; // Add flag for message sent
 bool triggerservos = false;
+
 void blink_active() {
     static bool LED = false;
     static unsigned long internal_timer = 0;
@@ -105,27 +106,37 @@ void readButtonPresses() {
                 if (!messageSent[i]) {
                     if (buttonLongPress[i]) {
                         GateStatusLongPress[i] = !GateStatusLongPress[i];
+                        Serial.println(GateStatusLongPress[i]);
                         BoardData.button = i;
+                        resetGateStatusArrays(true);
                         for (int j = 0; j < NUM_BUTTONS; j++) {
                             if (j != i) {
                                 GateStatusLongPress[j] = false;
+
                             }
                         }
                     } else if (buttonShortPress[i]) {
                         GateStatusShortPress[i] = !GateStatusShortPress[i];
                         BoardData.button = i;
+                        Serial.println(GateStatusShortPress[i]);
+                        resetGateStatusArrays(false);
                         for (int j = 0; j < NUM_BUTTONS; j++) {
                             if (j != i) {
                                 GateStatusShortPress[j] = false;
+
                             }
                         }
                     }
-                    // Ensure resetGateStatusArrays() does not reset the gate status arrays unless intended
-                    resetGateStatusArrays();
+                    Serial.println();
+                    
+                    
                     resolvePressConflicts(GateStatusLongPress, GateStatusShortPress, NUM_BUTTONS);
+                    delay(10);
+                    sendGateStatusToCentralNode(GateStatusLongPress, GateStatusShortPress);
                     messageSent[i] = true; // Set message sent flag
                     longpressflag = false;
                     PrintLocalGateArrays();
+                    PrintGateArrays();
                     triggerservos = true;
                 }
             }
@@ -141,6 +152,7 @@ void resolvePressConflicts(bool longPress[], bool shortPress[], int size) {
     for (int i = 0; i < size; ++i) {
         if (longPress[i] && shortPress[i]) {
             longPress[i] = false;
+            Serial.println("Conflict resolved");
         }
     }
 }

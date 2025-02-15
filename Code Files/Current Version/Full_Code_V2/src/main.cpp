@@ -54,7 +54,8 @@ void endpoint_main(){
     //testing_network();
     static unsigned long servotimer = 0;
     readButtonPresses();
-    if(millis() > servotimer + 500 || triggerservos == true){ 
+    //if(millis() > servotimer + 500 || triggerservos == true){ 
+      if(triggerservos == true){ 
         updateServoAngles(GateStatusShortPress, GateStatusLongPress);
         write_servo_position();
         servotimer = millis();
@@ -107,7 +108,7 @@ void testing_network(){
         int randomInt2 = random(0, 9);
         mapPressToBinary(randomInt, GateStatusShortPress);
         mapPressToBinary(randomInt2, GateStatusLongPress);
-        resetGateStatusArrays();
+        //resetGateStatusArrays();
         resolvePressConflicts(buttonLongPress, buttonShortPress, NUM_BUTTONS);
         sendGateStatusToCentralNode(GateStatusLongPress, GateStatusShortPress);
 

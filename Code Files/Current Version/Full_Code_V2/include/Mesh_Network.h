@@ -32,7 +32,7 @@ void startup_push();
 void mapPressToBinary(int value, bool GateStatusArray[4]);
 int mapBinaryToPress(const bool GateStatusArray[4]);
 void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusShortPress[4]);
-void resetGateStatusArrays();
+void resetGateStatusArrays(bool type);
 void push_data(); // Declare the new function
 void checkPressAndSetCollectorState(); // Declare the new function
 void PrintGateArrays();

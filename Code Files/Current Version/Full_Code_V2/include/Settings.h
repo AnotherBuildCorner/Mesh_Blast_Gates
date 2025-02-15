@@ -26,7 +26,7 @@ enum BoardTypeEnum {
 };
 
 // Declare settings-related variables
-inline BoardLabelEnum BoardSel = Central;
+inline BoardLabelEnum BoardSel = TS;
 inline BoardTypeEnum BoardTypeArray[] = {gates, gates, gates, collector, center};
 inline const char* BoardLabelArray[] = 
 {   "TS Board", 

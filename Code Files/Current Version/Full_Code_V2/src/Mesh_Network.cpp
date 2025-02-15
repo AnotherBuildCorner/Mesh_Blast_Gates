@@ -19,6 +19,7 @@ void EndpointDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomin
         Serial.println("Received reboot command");
         esp_restart();
     }
+    triggerservos = true;
 
     last_active = 10; // Highlight the usage of last_active
     if(BoardData.board <= NUM_GATE_BOARDS){
@@ -28,10 +29,13 @@ void EndpointDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomin
         Serial.println(" Actuated");}
 
     // Convert integer values to binary representation and write to GateStatus arrays
-    for (int i = 0; i < NUM_GATE_BOARDS; i++) {
-        mapPressToBinary(BoardData.ShortPress[i], GateStatusShortPress);
-        mapPressToBinary(BoardData.LongPress[i], GateStatusLongPress);
-    }
+
+        mapPressToBinary(BoardData.ShortPress[BoardSel], GateStatusShortPress);
+        mapPressToBinary(BoardData.LongPress[BoardSel], GateStatusLongPress);
+        PrintLocalGateArrays();
+    
+    //Serial.println("On Data RECV");
+    //PrintGateArrays();
 
     new_data_recv = true; // Set the new_data_recv flag to true
 }
@@ -161,10 +165,10 @@ void sendGateStatusToCentralNode(bool GateStatusLongPress[4], bool GateStatusSho
     esp_now_send(CentralNodeAddress, (uint8_t *) &BoardData, sizeof(BoardData));
 }
 
-void resetGateStatusArrays() {
+void resetGateStatusArrays(bool type) {
     for (int i = 0; i < NUM_SERVOS; ++i) {
-        BoardData.LongPress[i] = 0;
-        BoardData.ShortPress[i] = 0;
+        if(type == true) {BoardData.LongPress[i] = 0;}
+        else{BoardData.ShortPress[i] = 0;}
     }
     for (int i = NUM_SERVOS; i < NUM_PEERS; ++i) {
         BoardData.LongPress[i] = 0;

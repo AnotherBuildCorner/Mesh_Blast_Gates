@@ -26,6 +26,7 @@ extern bool buttonShortPress[NUM_BUTTONS];
 extern bool GateStatusLongPress[4];
 extern bool GateStatusShortPress[4];
 extern bool triggerservos;
+
 // Function prototypes
 void setup();
 void loop();

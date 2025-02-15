@@ -50,8 +50,8 @@ void write_servo_position() {
             newdata=true;
         }}
         if(newdata==true){
-            PrintCommandedAngles();
-            PrintLocalGateArrays();
+            //PrintCommandedAngles();
+            //PrintLocalGateArrays();
             newdata = false;
         }
         
