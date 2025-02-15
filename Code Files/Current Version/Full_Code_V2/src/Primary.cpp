@@ -1,6 +1,7 @@
 #include "Primary.h"
-#include "Servos.h" // Include Servos.h to access necessary variables
-#include "Mesh_Network.h" // Include Mesh_Network.h to access necessary variables
+#include "Servos.h"
+#include "Mesh_Network.h"
+#include "LEDs.h" // Include LEDs.h to access LED-related functions
 
 // Define last_active
 int last_active = 10;
@@ -91,7 +92,12 @@ void readButtonPresses() {
         if (buttonState == !pull && longpressflag == false) { // Check based on pull variablee
             if (buttonPressStart[i] == 0) {
                 buttonPressStart[i] = millis();
-            } else if (millis() - buttonPressStart[i] > 1000) { // Long press threshold
+            /* } else if (millis() - buttonPressStart[i] > 5000) { // Reset button press start time if it exceeds 5 seconds
+                BoardData.reboot = true;
+                esp_now_send(CentralNodeAddress, (uint8_t *) &BoardData, sizeof(BoardData));
+                delay(100);
+                esp_restart();*/
+            } else if (millis() - buttonPressStart[i] > 500) { // Long press threshold
                 buttonLongPress[i] = true;
                 buttonShortPress[i] = false;
                 buttonPressed = true;
@@ -157,26 +163,6 @@ void resolvePressConflicts(bool longPress[], bool shortPress[], int size) {
     }
 }
 
-void TestLED(bool shortPress[], bool longPress[], const int servoPins[]) {
-    for (int i = 0; i < NUM_SERVOS; i++) {
-        if (shortPress[i] || longPress[i]) {
-            digitalWrite(servoPins[i], HIGH);
-            Serial.print(i);
-            Serial.println(" LED ON");
-        } else {
-            digitalWrite(servoPins[i], LOW);
-        }
-    }
-}
 
-void illuminateLEDsBasedOnPress(bool shortPress[], bool longPress[], const int servoPins[]) {
-    for (int i = 0; i < NUM_SERVOS; i++) {
-        if (shortPress[i] || longPress[i]) {
-            digitalWrite(servoPins[i], HIGH);
-        } else {
-            digitalWrite(servoPins[i], LOW);
-        }
-    }
-}
 
 

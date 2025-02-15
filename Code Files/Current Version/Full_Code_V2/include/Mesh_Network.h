@@ -17,6 +17,7 @@ typedef struct Board_Data {
     bool reboot;
     int ShortTimer = Short_Timer_Min;
     int LongTimer = Long_Timer_Min;
+    int DelayTimer = CollectorDelay;
     int LongPress[NUM_PEERS];
     int ShortPress[NUM_PEERS];
 } Board_Data;

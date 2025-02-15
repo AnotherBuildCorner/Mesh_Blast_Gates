@@ -8,7 +8,7 @@ const int debounceTime = 200;
 const bool startstate = LOW;
 
 extern bool new_data_recv;
-const unsigned long Minutes =   60000;
+const unsigned long Minutes = 60000;
 unsigned long timer = 0;
 unsigned long timeend = 0;
 unsigned long gatetimer = 0;
@@ -69,7 +69,7 @@ void ControlFromIncoming() {
         gatetimer = millis();
         lock1 = true;
     }
-        if(millis() > gatetimer + 1000*CollectorDelay){
+        if(millis() > gatetimer + 1000*BoardData.DelayTimer){
         SetRelayState(0, BoardData.CollectorState);
         lock1 = false;
         Serial.println("CollectorState changed to " + String(BoardData.CollectorState));
@@ -80,7 +80,7 @@ void ControlFromIncoming() {
             lock2 = true;
         }
 
-        if(millis() > gatetimer2 + 1000*CollectorDelay){
+        if(millis() > gatetimer2 + 1000*BoardData.DelayTimer){
         SetRelayState(1, BoardData.ExtraState);
         lock2 = false;
         Serial.println("ExtraState changed to " + String(BoardData.ExtraState));

@@ -46,10 +46,6 @@ void CentralNodeDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) 
 
 void CentralNodeDataRecv(const esp_now_recv_info* recv_info, const uint8_t* incomingData, int len) {
     memcpy(&BoardData, incomingData, sizeof(BoardData));
-    if (BoardData.reboot == true) {
-        Serial.println("Received reboot command");
-        esp_restart();
-    }
 
     last_active = 10; // Highlight the usage of last_active
     if(BoardData.board <= NUM_GATE_BOARDS){
@@ -60,6 +56,12 @@ void CentralNodeDataRecv(const esp_now_recv_info* recv_info, const uint8_t* inco
     PrintGateArrays();
 
     new_data_recv = true; // Set the new_data_recv flag to true
+
+    if (BoardData.reboot == true) {
+        Serial.println("Received reboot command");
+        delay(100);
+        esp_restart();
+    }
 }
 
 void push_data() {

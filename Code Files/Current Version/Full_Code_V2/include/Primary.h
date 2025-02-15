@@ -35,6 +35,6 @@ void InitializeWIFI_Serial();
 void Initialize_Buttons();
 void readButtonPresses();
 void resolvePressConflicts(bool longPress[], bool shortPress[], int size);
-void TestLED(bool shortPress[], bool longPress[], const int servoPins[]);
+
 
 #endif // PRIMARY_H

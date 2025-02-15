@@ -6,8 +6,8 @@
 #define NUM_GATE_BOARDS 3
 #define NUM_PEERS 5  // Total Number of Chips in system
 #define NUM_BUTTONS 4 // Max number buttons per board
-#define Short_Timer_Min  1
-#define Long_Timer_Min 2
+#define Short_Timer_Min  60
+#define Long_Timer_Min 240
 #define CollectorDelay 1 // second
 // Define enums for board labels and types
 enum BoardLabelEnum {
@@ -25,7 +25,7 @@ enum BoardTypeEnum {
     remote
 };
 // Declare settings-related variables
-inline BoardLabelEnum BoardSel = DC;
+inline BoardLabelEnum BoardSel = Central;
 inline BoardTypeEnum BoardTypeArray[] = {gates, gates, gates, collector, center};
 inline const char* BoardLabelArray[] = 
 {   "TS Board", 
@@ -41,10 +41,12 @@ inline const char GateNames[NUM_GATE_BOARDS][NUM_BUTTONS][20] = {
 inline const uint8_t CentralNodeAddress[6] = {0x8C, 0xBF, 0xEA, 0xCF, 0x7F, 0x00};
 inline const uint8_t EndpointAddresses[][6] = {
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},  // Dummy Address for location of Central Node
-    {0x8C, 0xBF, 0xEA, 0xCF, 0x82, 0x3C},
-    {0x8C, 0xBF, 0xEA, 0xCF, 0x75, 0x44},
-    {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // Bandsaw board
-    {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0}  // DC V2
+    //{0x8C, 0xBF, 0xEA, 0xCF, 0x82, 0x3C},
+    //{0x8C, 0xBF, 0xEA, 0xCF, 0x75, 0x44},
+    {0xF0, 0xF5, 0xBD, 0x2C, 0xFF, 0x80}, // #3  Tablesaw Board
+    {0xF0, 0xF5, 0xBD, 0x2D, 0x03, 0x58}, //#2   Chopsaw Board
+    {0xF0, 0xF5, 0xBD, 0x2D, 0x14, 0x4C}, // #1  Bandsaw board
+    {0xF0, 0xF5, 0xBD, 0x2C, 0xF9, 0xE0},  //DC V2*/
 };
 
 // Declare constants

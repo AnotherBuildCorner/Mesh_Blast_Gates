@@ -6,7 +6,7 @@
 #include "Current_Sense.h"
 #include "Relays.h" 
 #include "Settings.h" // Include Settings.h
-
+#include "LEDs.h" // Include LEDs.h
 // Function prototype for testing_network
 void testing_network();
 void endpoint_setup();
@@ -68,8 +68,12 @@ void endpoint_main(){
 void central_node_setup(){
     // Initialize WiFi and Serial
     InitializeWIFI_Serial();  
+   // initializeLEDs();
     // Launch mesh network
     LaunchCentralNode();
+    new_data_recv = true;
+    delay(1000);
+    push_data();
     delay(2000);
     Serial.println("Central Node Setup Complete");
 }
@@ -80,6 +84,8 @@ void central_node_main(){
     if(new_data_recv == true && millis() > nodetimer + 500){
         push_data();
     }
+    //checkstates();
+    //RunLEDs(false);
 }
 
 void collector_node_setup(){
