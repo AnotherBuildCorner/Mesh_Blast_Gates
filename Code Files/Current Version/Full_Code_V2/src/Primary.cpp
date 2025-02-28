@@ -97,12 +97,12 @@ void readButtonPresses() {
                 esp_now_send(CentralNodeAddress, (uint8_t *) &BoardData, sizeof(BoardData));
                 delay(100);
                 esp_restart();*/
-            } else if (millis() - buttonPressStart[i] > 500) { // Long press threshold
+            } else if (millis() - buttonPressStart[i] > longpresstime) { // Long press threshold
                 buttonLongPress[i] = true;
                 buttonShortPress[i] = false;
                 buttonPressed = true;
                 longpressflag = true;
-            } else if (millis() - buttonPressStart[i] > 50) { // Short press threshold
+            } else if (millis() - buttonPressStart[i] > shortpresstime) { // Short press threshold
                 buttonShortPress[i] = true;
                 buttonLongPress[i] = false;
                 buttonPressed = true;

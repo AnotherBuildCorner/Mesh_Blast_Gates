@@ -17,6 +17,8 @@ const bool pull = 1; //0 for down 1 for up
 #define NUM_SERVOS 4 //Max number servos per board
 // Define single_or_dual ended sensing
 #define single_or_dual 2
+#define longpresstime 750
+#define shortpresstime 50
 
 // Ensure extern variables are declared
 extern int last_active;

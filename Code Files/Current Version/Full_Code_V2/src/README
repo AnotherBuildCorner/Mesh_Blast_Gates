@@ -1,0 +1,15 @@
+Last notes. Attempted to add 
+
+if(GateStatusLongPress[i] == true && BoardData.collectorstate == false){
+  boarddata.collectorstate == true
+}
+
+To catch the rare time when the timers shut down the collector, while leaving the blast gates open. however it appears the control scheme for the collector being defined as any one gate being open is overriding this and forcing the gate to toggle anyways.
+Ignoring for the moment, will find out if the timers even cause problems in practice, as in principle they are only a safety measure.
+
+Also, turning the system off when a long press gate is open might be tedious. 
+At present the called for method is either long pressing the correct gate, or long then short pressing any gate, or short then long, either way this trips the gate overlap function which reverts to the short press being considered "open"  
+
+Perhaps a double tap to toggle dust collector option is required. which may require redefining the way the central node determines if the collector is active.
+
+Current sensing remains disabled for the moment.

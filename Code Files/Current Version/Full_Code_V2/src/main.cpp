@@ -7,6 +7,8 @@
 #include "Relays.h" 
 #include "Settings.h" // Include Settings.h
 #include "LEDs.h" // Include LEDs.h
+#include "Screen.h" // Include Screen.h
+
 // Function prototype for testing_network
 void testing_network();
 void endpoint_setup();
@@ -67,10 +69,15 @@ void endpoint_main(){
 
 void central_node_setup(){
     // Initialize WiFi and Serial
+    initializeScreen();
     InitializeWIFI_Serial();  
-   // initializeLEDs();
+    // Initialize the screen
+    
+    // initializeLEDs();
     // Launch mesh network
+    
     LaunchCentralNode();
+    
     new_data_recv = true;
     delay(1000);
     push_data();
@@ -80,10 +87,14 @@ void central_node_setup(){
 
 void central_node_main(){
     static unsigned long nodetimer = 0;
+    static unsigned long screentimer = 0;
+    static bool reset_count = false;
     blink_active();
     if(new_data_recv == true && millis() > nodetimer + 500){
         push_data();
+        reset_count = true;
     }
+    reset_count = screenhandler(reset_count);
     //checkstates();
     //RunLEDs(false);
 }
