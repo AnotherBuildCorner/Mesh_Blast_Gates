@@ -70,6 +70,13 @@ void endpoint_main(){
 void central_node_setup(){
     // Initialize WiFi and Serial
     initializeScreen();
+    pinMode(3, OUTPUT);
+    digitalWrite(3, LOW); // Activate RF switch control
+
+    delay(100);
+
+    pinMode(14, OUTPUT);
+    digitalWrite(14, HIGH); // Use external antenna
     InitializeWIFI_Serial();  
     // Initialize the screen
     
@@ -100,6 +107,7 @@ void central_node_main(){
 }
 
 void collector_node_setup(){
+
     InitializeWIFI_Serial(); 
     Initialize_Relays();
     Initialize_Relay_Buttons();
