@@ -72,7 +72,14 @@ void push_data() {
         }
         new_data_recv = false; // Reset the flag after sending data
     }
+    else{
+        checkPressAndSetCollectorState();
+        for (int i = 0; i < NUM_PEERS; i++) {
+            esp_now_send(EndpointAddresses[i], (uint8_t *) &BoardData, sizeof(BoardData));
+    }}
 }
+
+
 
 void checkPressAndSetCollectorState() {
     for (int i = 0; i < NUM_GATE_BOARDS; i++) {

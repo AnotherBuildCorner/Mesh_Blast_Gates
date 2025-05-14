@@ -111,15 +111,15 @@ void displayOLED(const char* shortGateName, const char* longGateName, int countd
     static unsigned long shutdownscreen = 0;
     static bool shutdown = false;
     display.clearDisplay();
-    display.setTextSize(1);
+    display.setTextSize(2);
     display.setTextColor(SSD1306_WHITE);
 
     display.setCursor(0, 0);
-    display.println("Long Press Gate: ");
+    //display.println("Long Press Gate: ");
     display.println(longGateName);
 
     display.setCursor(0, 20);
-    display.println("Short Press Gate: ");
+    //display.println("Short Press Gate: ");
     display.println(shortGateName);
 
     

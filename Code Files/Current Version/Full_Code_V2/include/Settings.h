@@ -6,7 +6,7 @@
 #define NUM_GATE_BOARDS 3
 #define NUM_PEERS 5  // Total Number of Chips in system
 #define NUM_BUTTONS 4 // Max number buttons per board
-#define Short_Timer_Min  60
+#define Short_Timer_Min  120
 #define Long_Timer_Min 240
 #define CollectorDelay 1 // second
 // Define enums for board labels and types

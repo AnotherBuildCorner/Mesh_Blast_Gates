@@ -97,11 +97,16 @@ void central_node_main(){
     static unsigned long screentimer = 0;
     static bool reset_count = false;
     blink_active();
-    if(new_data_recv == true && millis() > nodetimer + 500){
+    if(new_data_recv == true && millis() > nodetimer + 100){
         push_data();
         reset_count = true;
+        nodetimer = millis();
     }
     reset_count = screenhandler(reset_count);
+    if(millis() > nodetimer + 2000){
+        push_data();
+        nodetimer = millis();
+    }
     //checkstates();
     //RunLEDs(false);
 }
