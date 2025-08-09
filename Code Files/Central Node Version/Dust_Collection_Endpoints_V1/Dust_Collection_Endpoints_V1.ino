@@ -23,7 +23,7 @@ const bool pull = 1; //0 for down 1 for up
 #define LED_pwr 20
 
 #define rebootpushenable 0
-const float LED_rng[2] = {6.5,7.5};
+const float LED_rng[2] = {6.5,8.0};
 const int debounce[NUM_BOARDS] = {100,100,100};
 const int buttonPins[NUM_BUTTONS] = {2, 21, 22, 23};  // Change as per your setup
 const int servoPins[NUM_SERVOS] = {16, 17, 18, 19};      // Change as per your setup
@@ -65,6 +65,8 @@ unsigned long timer0[NUM_BUTTONS],timer1[NUM_BUTTONS];
 unsigned long t2;
 bool timerlock[NUM_BUTTONS];
 
+unsigned long serialtimer = 0;
+
 int angle[NUM_SERVOS] = {0,0,0,0};
 int pastangle[NUM_SERVOS] = {0,0,0,0};
 bool gateflag = true;
@@ -93,6 +95,7 @@ const uint8_t broadcastAddresses[NUM_PEERS][6] = {
 void setup() {
   Serial.begin(115200);
   pinMode(LED_BUILTIN,OUTPUT);
+  pinMode(LED_pwr,OUTPUT);
   
   WiFi.mode(WIFI_STA);
 
@@ -160,12 +163,15 @@ Serial.println("Setup Complete");
 void loop() {
   blink_active();
   readCurrent();
+  if(serialtimer+1000 < millis()){
+    serialtimer = millis();
+    Serial.println(voltages[1]);
   if(voltages[0] >= LED_rng[0] && voltages[0] <= LED_rng[1]){
     digitalWrite(LED_pwr, 1);
   }
   else{
     digitalWrite(LED_pwr,0);
-  }
+  }}
 
   for (int i = 0; i < NUM_BUTTONS; i++) {
       if (digitalRead(buttonPins[i]) == pull){  // reset timer flag
