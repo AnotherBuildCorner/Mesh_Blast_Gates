@@ -2,9 +2,11 @@
 #include "primary.h"
 #include <Arduino.h>
 #include "mesh_network.h"
+#include "Current_Sense.h"
 const int LED_pins[3] = {17,18,19};
 int states[3] ={0};
 
+#define regulator_led 20
 
 void RunLED(int LED_Pin, bool active, bool mode){
     static int light = 0;
@@ -36,7 +38,24 @@ else{
     }
 }
 }
+void init_regulator(){
+    pinMode(regulator_led,OUTPUT);
+}
+void Regulator_LED(){
+    static unsigned long t1 = 0;
+    static bool LED_state = false;
+    if(millis() > t1 + 200){
+        t1 = millis();
+        if(voltages[0] > Vref_range[0] && voltages[0] < Vref_range[1]){
+            LED_state = true;
+        }
+        else{
+            LED_state = false;
+        }
+        digitalWrite(regulator_led,LED_state);
+    }
 
+}
 
 void checkstates(){
     static int Longs = 0;

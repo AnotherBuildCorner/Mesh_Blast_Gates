@@ -7,6 +7,8 @@ float voltages[single_or_dual] = {0};
 float current = 0;
 bool currenttrigger = false;
 
+float Vref_range[2]= {6, 7.5};
+
 void readCurrent() {
     for (int i = 0; i < single_or_dual; i++) {
         powerread[i] = analogRead(powerPins[i]);

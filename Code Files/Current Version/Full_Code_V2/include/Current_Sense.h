@@ -3,7 +3,7 @@
 
 #include "Primary.h"
 
-#define SenseEnable false
+#define SenseEnable true
 
 #define vss 5 // 6.1?
 #define vcc 3.3
@@ -21,6 +21,7 @@ extern float powerread[single_or_dual];
 extern float voltages[single_or_dual];
 extern float current;
 extern bool currenttrigger;
+extern float Vref_range[2];
 
 void readCurrent();
 
