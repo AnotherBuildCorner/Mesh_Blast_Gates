@@ -50,6 +50,7 @@ void blink_active() {
 }
 
 void InitializeWIFI_Serial() {
+    delay(2000);
     Serial.begin(115200);
     pinMode(LED_BUILTIN, OUTPUT);
 
