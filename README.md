@@ -65,18 +65,15 @@ So for my system, which uses 8 gates, 3 control boards, and a relay board the to
 There are some improvements left to be implemented. The core of which is still better power distribution/control. As well as updating the physical gate structures.
 things i'd like to add
 ### PCB
-- Break out the Buck controller onto a separate PCB, for times when USB power is simply enough.
-- Allow for 24-36 VDC supply into the Buck controller, in addition to the 24VAC Doorbell transformer currently.
-- Finish ESD Hardening, probably need an earth connection (ground to the house mains or something).
+- Completed desired updates. see V3
 ### Mechanical
-- Build out a more complete mounting bracket with better Rack mounting
-- possibly add a top guide pin to the Pinion
+
 - Add some form of mechanical clutch system.
 - - Spring or screw compressed V band on the pinion (spring prefered, but introduces complexity and potential calibrations)
 - - Switch from rack and pinion to V wheel and slider with TPU surface
 - - add a slider into the rack with a helical spring mounted for bi-directional movement
 - - Add TPU teeth to the rack or pinion so they can slip under excessive tension
-- - Improve the Rack to gate mount for accuracy, reducing the need for specific clutch structures
+
 
 ### Code
 - Current code has a strict 1HR timer on dust collection before shutdown
@@ -86,7 +83,35 @@ things i'd like to add
 - add a multiple tool mode. Say having the CNC active and a drum sander. 
 - consider changing the direct peer-peer mesh to a central node structure. Every time I have to replace one chip, reflashing the entire network is required... and some of the chips are hard to reach. Ideally an auto-detect model would be great.
 
-## V3   IN PROGRESS
+## V3 
+
+### PCB
+V3 PCB is now live. Implementing two desired changes over the V2 Board.
+The first is integrating the TVS diodes into the PCB on both the Servo signal lines, as well as the input switches. So far this has prevented any fried servos or bad ESP's in testing.
+![alt text](<Photos/V3/V3 Endpoint PCB.png>)
+Second is the Buck-Boost board has been swapped for a commercially available premade PCB. The board provides up to 24V input, and trim controlled output. The PCB also includes a new LED tied directly to the ESP, this LED is programmed to illuminate between 7 and 8V currently to allow calibrating the new board.
+The input Bridge Rectifier has been retained, as well as the smoothing cap. This allows for polarity agnotsic DC, as well as AC input for the boards. Currently running on 12V mains.
+
+### Mechanical.
+The gear drive system has been slightly refined.
+The teeth are now 2mm straight cut gears, with a wider dual guide Rack, and a slot cut into one end to capture the blast gate without additional hardware. The baseplate has been thickened by an additional 2mm. and the gears now feature a multiple cut design on the underside to accomodate multiple servo horn shapes besides the round one. No more skipping of the gears now.
+![alt text](<Photos/V3/Gear Slide V-V2.JPG>)
+### Code
+The system now runs on a central node with a display screen. This way anytime the system is updated (say an ESP dies, or a new board is added) only the new board, and the central node need to be reflashed. Instead of correcting the entire system.
+a strict 2 hour timer has been implemented for both short and long press gate openings.
+
+Current sensing is back online in dual ended mode. With a 1.5A current limit, which enforces a chip reset currently. Future updates will force the gate to stop in position. No boards fried yet, but a couple fuses tripped due to user error.
+
+Additionally, the central node has a configurable resend timer. In the past messages were failing to shut down the dust collector as required. With this resend, reliability has reached 100%, although sometimes it can take up to 3 cycles.
+
+Future additions will be to include some kind of current sensing, or non-pushbutton operation perhaps. For things like CNC's with vacuum switching relays, or hall-effect sensors on certain tools. 
+Also, the dual gate mode may be updated to set both gates to partially open, to retain system pressure.  TBD.
+Lastly, it would be ideal to push all the configuration settings from the central node. so only a preliminary flash will be needed for each endpoint.  For now this is a stretch goal.
+
+
+
+
+### Previous IN PROGRESS notes for V3
 Well, as one set of errors is removed, a new set begins to rear its ugly head. 
 
 ### PCB

@@ -47,12 +47,14 @@ void endpoint_setup(){
     Initialize_Servos();
     // Launch mesh network
     LaunchEndpoints();
+    init_regulator();
     delay(2000);
     Serial.println("Setup Complete");
 }
 
 void endpoint_main(){
     blink_active();
+    Regulator_LED();
     //testing_network();
     static unsigned long servotimer = 0;
     readButtonPresses();
